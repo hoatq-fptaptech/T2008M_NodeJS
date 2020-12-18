@@ -1,11 +1,14 @@
 const express = require("express");
 const mssql = require("mssql");
+const bodyParser = require("body-parser");
 const app = express();
 const port = process.env.PORT||5000;// khai bao 1 hang so
 // mở cổng để vào
 app.listen(port,function () {
     console.log("Server is running...");
 })
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json())
 // kêt nối với SQL SERVER và DB để truy vấn dữ liệu
 const config = {
     server:"demosqlgroup.database.windows.net",
@@ -60,5 +63,33 @@ app.get("/tim-kiem-dong-xe",function (req,res) {
     rq.query(txt, function (err,rows) {
         if(err) res.send(err)
         else res.send(rows.recordset);
+    })
+})
+app.post("/them-dong-xe",function (req,res) {
+    var dongxe = req.body.dongxe;
+    var hangxe = req.body.hangxe;
+    var socho = req.body.socho;
+    var txt=  "insert into A9_dongxe(dongxe,hangxe,Socho) values('"+dongxe+"','"+hangxe+"',"+socho+")";
+    rq.query(txt,function (err) {
+        if(err) res.send(false);
+        else res.send(true);
+    })
+})
+app.post("/sua-dong-xe",function (req,res) {
+    var dongxe = req.body.dongxe;
+    var hangxe = req.body.hangxe;
+    var socho = req.body.socho;
+    var txt=  "update A9_dongxe set hangxe='"+hangxe+"' ,Socho="+socho+" WHERE dongxe like '"+dongxe+"'";
+    rq.query(txt,function (err) {
+        if(err) res.send(false);
+        else res.send(true);
+    })
+})
+app.post("/xoa-dong-xe",function (req,res) {
+    var dongxe = req.body.dongxe;
+    var txt=  "delete from A9_dongxe where dongxe like '"+dongxe+"'";
+    rq.query(txt,function (err) {
+        if(err) res.send(false);
+        else res.send(true);
     })
 })
